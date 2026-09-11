@@ -1,0 +1,68 @@
+.TH MOCK-SBOM-GENERATOR 1 "September 2026" "mock-sbom-generator 2.0.0" "User Commands"
+.SH NAME
+mock-sbom-generator \- generate CycloneDX or SPDX SBOMs from Mock build artifacts
+.SH SYNOPSIS
+.B mock-sbom-generator
+[\fIOPTIONS\fR]
+.SH DESCRIPTION
+Generate a Software Bill of Materials from a Mock result directory.
+The same tool is invoked by the
+.B sbom_generator
+Mock plugin after a successful build.
+.PP
+Default output is CycloneDX 1.6 JSON named
+.I <name>-<version>-<release>.sbom
+plus a
+.I .sha256
+sidecar. SPDX 2.3 JSON is written as
+.I <name>-<version>-<release>.spdx.json
+when
+.B --type spdx
+is given.
+.SH OPTIONS
+.TP
+.B --type {cyclonedx,spdx}
+Document format (default: cyclonedx).
+.TP
+.BI --resultdir " DIR"
+Directory containing built RPMs/SRPMs (required).
+.TP
+.BI --root " DIR"
+Mock build chroot root. Required for toolchain and chroot RPM queries.
+Omitting it skips those collectors.
+.B --root /
+is rejected.
+.TP
+.BI --builddir " PATH"
+Chroot-relative build directory (default:
+.IR /builddir/build ).
+.TP
+.BI --prebuild-json " FILE"
+Optional forensic snapshot written by the plugin before the build.
+.TP
+.B --include-file-components true|false
+.TP
+.B --include-file-dependencies true|false
+.TP
+.B --include-debug-files true|false
+.TP
+.B --include-man-pages true|false
+.TP
+.B --include-source-dependencies true|false
+.TP
+.B --include-toolchain-dependencies true|false
+.TP
+.B --generate-cpe true|false
+Emit heuristic CPE identifiers (default: false).
+.TP
+.B -v , --verbose
+Debug logging.
+.SH FILES
+.TP
+.I /usr/lib*/python*/site-packages/mockbuild/plugins/sbom_generator.py
+Mock plugin (enable with
+.BR "mock --enable-plugin=sbom_generator" ).
+.SH SEE ALSO
+.BR mock (1)
+.SH AUTHOR
+Scott R. Shinn, Atomicorp, Inc.
