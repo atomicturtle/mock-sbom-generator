@@ -15,7 +15,8 @@ Installs next to distro `mock >= 6.1` by placing files into mock's `mockbuild` p
 - `SOURCES/mockbuild/sbom_generate.py` — collection/orchestration
 - `SOURCES/mockbuild/sbom_utils.py` — RPM and file helpers
 - `SOURCES/mockbuild/sbom_cyclonedx.py` / `sbom_spdx.py` — Atomic BOM writers
-- `VERSION` — project release (`2.0.0`); keep in sync with `mock-sbom-generator.spec` `Version:`
+- `VERSION` — project release (`2.0.0`); keep in sync with `mock-sbom-generator.spec` `Version:` and `CHANGELOG.md`
+- `CHANGELOG.md` — release notes; add an entry when `VERSION` changes
 - `mock-sbom-generator.spec` — overlay RPM; `%setup` then `make` / `make install`
 - GitLab packaging (mock configs, `.gitlab-ci.yml`) lives in a separate pipeline repo, not here
 

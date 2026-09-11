@@ -51,7 +51,7 @@ and plugin. Enable it with: mock --enable-plugin=sbom_generator
 
 %files
 %license LICENSE
-%doc README.md
+%doc README.md CHANGELOG.md
 %{_bindir}/mock-sbom-generator
 %{_mandir}/man1/mock-sbom-generator.1*
 %{python_sitelib}/mockbuild/plugins/sbom_generator.py*

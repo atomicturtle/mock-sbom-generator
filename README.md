@@ -21,6 +21,7 @@ distro Mock release ships the same files.
 | CycloneDX 1.6 / SPDX 2.3 | On-disk formats (not a private schema) |
 
 Agents: start at [llms.txt](llms.txt). Contributors using coding agents: [AGENTS.md](AGENTS.md).
+Release notes: [CHANGELOG.md](CHANGELOG.md).
 
 ## Features
 

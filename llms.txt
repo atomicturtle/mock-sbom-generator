@@ -9,6 +9,7 @@ Default CycloneDX Atomic BOM: `<name>-<version>-<release>.sbom` plus a `.sha256`
 ## Docs
 
 - [README](README.md): Atomic BOM overview, Atomic repo install, enablement, CLI examples
+- [CHANGELOG.md](CHANGELOG.md): Atomic BOM release history
 - [Plugin-SBOM.md](SOURCES/Plugin-SBOM.md): Full plugin usage, trust model, chroot/bootstrap execution, scanner examples
 - [AGENTS.md](AGENTS.md): Instructions for coding agents working in this repository
 - [man page](SOURCES/mock-sbom-generator.1): CLI options for `/usr/bin/mock-sbom-generator`
