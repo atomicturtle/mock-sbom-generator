@@ -211,15 +211,6 @@ toolchain.
   bootstrap for the run (or the default generator is copied under
   `/usr/libexec/mock-sbom/`). Paths inside the **target** buildroot are refused.
 
-**Legacy 1.x plugin options:** If ``command`` is unset, the overlay plugin still
-honors 1.x boolean keys on ``sbom_generator_opts``
-(``include_file_components``, ``include_file_dependencies``,
-``include_debug_files``, ``include_man_pages``,
-``include_source_dependencies``, ``include_toolchain_dependencies``,
-``generate_cpe``) by mapping them onto the default CLI flags. An explicit
-``command`` string always wins. See the package README for a full 1.x → 2.x
-migration note.
-
 **CLI flags on ``mock-sbom-generator``** (embed in ``command`` as needed):
 
 - `--type`: `cyclonedx` (default) or `spdx`.

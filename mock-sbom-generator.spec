@@ -8,20 +8,13 @@
 # Conflicts with that future mock package are enough; do not Conflicts: mock
 # until then.
 
-Summary: SBOM Generator plugin and CLI for mock
+Summary: Atomic BOM plugin and CLI for mock
 Name: mock-sbom-generator
 Version: 2.0.0
 Release: 1%{?dist}
 License: GPL-2.0-or-later
-Source0: sbom_generator.py
-Source1: Plugin-SBOM.md
-Source2: mock-sbom-generator.py
-Source3: sbom_generate.py
-Source4: sbom_utils.py
-Source5: sbom_cyclonedx.py
-Source6: sbom_spdx.py
-Source7: mock-sbom-generator.1
 URL: https://github.com/atomicturtle/mock-sbom-generator
+Source0: %{url}/archive/%{version}/%{name}-%{version}.tar.gz
 Vendor: Atomicorp, Inc. https://www.atomicorp.com
 Packager: Atomicorp, Inc. https://www.atomicorp.com
 BuildArch: noarch
@@ -30,42 +23,35 @@ Requires: mock >= 6.1
 Requires: python3-rpm
 Requires: python3-distro
 Recommends: python3-specfile
+BuildRequires: make
 BuildRequires: python%{python3_pkgversion}-devel
 
 %description
-Mock plugin and standalone CLI that generate a Software Bill of Materials
-(SBOM) in CycloneDX 1.6 or SPDX 2.3 JSON for packages built with Mock.
-The SBOM records the build environment, source files, toolchain packages,
-and resulting RPMs, and is compatible with vulnerability scanners
-(Grype, Trivy, Snyk, sbom-auditor).
+Mock plugin and standalone CLI that generate an Atomic BOM, Atomicorp's
+Software Bill of Materials for packages built with Mock. The document is
+CycloneDX 1.6 or SPDX 2.3 JSON and records the build environment, source
+files, toolchain packages, and resulting RPMs. It is compatible with
+vulnerability scanners (Grype, Trivy, Snyk, sbom-auditor).
 
 This package overlays mock's Python site library with the generator modules
 and plugin. Enable it with: mock --enable-plugin=sbom_generator
 
 %prep
-# No prep needed - using source files directly
+%autosetup -n %{name}-%{version}
 
 %build
-# No build step needed for Python plugin
+%make_build
 
 %install
-install -d %{buildroot}%{python_sitelib}/mockbuild/plugins
-install -m 0644 %{SOURCE0} %{buildroot}%{python_sitelib}/mockbuild/plugins/sbom_generator.py
-install -m 0644 %{SOURCE3} %{buildroot}%{python_sitelib}/mockbuild/sbom_generate.py
-install -m 0644 %{SOURCE4} %{buildroot}%{python_sitelib}/mockbuild/sbom_utils.py
-install -m 0644 %{SOURCE5} %{buildroot}%{python_sitelib}/mockbuild/sbom_cyclonedx.py
-install -m 0644 %{SOURCE6} %{buildroot}%{python_sitelib}/mockbuild/sbom_spdx.py
-
-install -d %{buildroot}%{_bindir}
-install -m 0755 %{SOURCE2} %{buildroot}%{_bindir}/mock-sbom-generator
-
-install -d %{buildroot}%{_mandir}/man1
-install -m 0644 %{SOURCE7} %{buildroot}%{_mandir}/man1/mock-sbom-generator.1
-
-install -d %{buildroot}%{_docdir}/%{name}
-install -m 0644 %{SOURCE1} %{buildroot}%{_docdir}/%{name}/
+%make_install \
+    PREFIX=%{_prefix} \
+    SITELIB=%{python_sitelib} \
+    MANDIR=%{_mandir} \
+    DOCDIR=%{_docdir}/%{name}
 
 %files
+%license LICENSE
+%doc README.md
 %{_bindir}/mock-sbom-generator
 %{_mandir}/man1/mock-sbom-generator.1*
 %{python_sitelib}/mockbuild/plugins/sbom_generator.py*
@@ -83,7 +69,7 @@ install -m 0644 %{SOURCE1} %{buildroot}%{_docdir}/%{name}/
 - Split monolith into plugin + CLI + library (CycloneDX 1.6 and SPDX 2.3)
 - Standalone mock-sbom-generator CLI; plugin invokes it at postbuild
 - Prebuild forensic sbom-prebuild.json and bootstrap-native execution
-- Map 1.x include_* plugin opts onto CLI flags when command is unset
+- Build from the versioned source tarball with make / make install
 - Requires python3-rpm and python3-distro; python3-specfile recommended
 
 * Sun Dec 28 2025 scott@atomicorp.com - 1.2.5-1

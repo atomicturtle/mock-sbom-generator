@@ -1,0 +1,35 @@
+# Atomic BOM
+
+> Atomic BOM 2.0.0 is Atomicorp's Software Bill of Materials for RPM packages built with Mock: a build-time inventory of sources, toolchain, hardening, and resulting RPMs. mock-sbom-generator (RPM/CLI) and the sbom_generator Mock plugin produce it. On disk it is CycloneDX 1.6 JSON or SPDX 2.3 JSON, not a private schema.
+
+Use **Atomic BOM** for the generated document. Use `mock-sbom-generator` for the RPM and `/usr/bin` CLI, and `sbom_generator` for the Mock plugin (`mock --enable-plugin=sbom_generator`). Do not invent an atomic-bom media type, file extension, or format. Install the RPM from the Atomic repository (`https://updates.atomicorp.com/installers/atomic` then `dnf install mock-sbom-generator`) next to distro mock >= 6.1. Mock auto-discovers the plugin from mockbuild/plugins. This is not a Mock fork and does not patch Mock's PLUGIN_LIST. Retire the overlay when upstream mock ships the same files (https://github.com/rpm-software-management/mock/pull/1682).
+
+Default CycloneDX Atomic BOM: `<name>-<version>-<release>.sbom` plus a `.sha256` sidecar, and `sbom-prebuild.json`. SPDX uses `<name>-<version>-<release>.spdx.json`. CPE identifiers are off unless `--generate-cpe true`. Runtime requires python3-rpm and python3-distro; python3-specfile is recommended.
+
+## Docs
+
+- [README](README.md): Atomic BOM overview, Atomic repo install, enablement, CLI examples
+- [Plugin-SBOM.md](SOURCES/Plugin-SBOM.md): Full plugin usage, trust model, chroot/bootstrap execution, scanner examples
+- [AGENTS.md](AGENTS.md): Instructions for coding agents working in this repository
+- [man page](SOURCES/mock-sbom-generator.1): CLI options for `/usr/bin/mock-sbom-generator`
+- [VERSION](VERSION): Project release version (keep in sync with the spec `Version:`)
+- [RPM spec](mock-sbom-generator.spec): Overlay packaging into mock's mockbuild site-library from the 2.0.0 source tarball
+
+## Source
+
+- [sbom_generator.py](SOURCES/plugins/sbom_generator.py): Mock plugin; invokes the CLI at postbuild to write the Atomic BOM
+- [mock-sbom-generator.py](SOURCES/mock-sbom-generator.py): Standalone Atomic BOM CLI
+- [sbom_generate.py](SOURCES/mockbuild/sbom_generate.py): Orchestrates collectors and writers
+- [sbom_utils.py](SOURCES/mockbuild/sbom_utils.py): RPM/file helpers, PURLs, hashes
+- [sbom_cyclonedx.py](SOURCES/mockbuild/sbom_cyclonedx.py): CycloneDX 1.6 Atomic BOM writer
+- [sbom_spdx.py](SOURCES/mockbuild/sbom_spdx.py): SPDX 2.3 Atomic BOM writer
+
+## Optional
+
+- [Atomic repository](https://updates.atomicorp.com/channels/atomic/): Packaged RPM (`dnf install mock-sbom-generator` after the Atomic installer)
+- [Atomic installer](https://updates.atomicorp.com/installers/atomic): Enables the Atomic yum/dnf repository
+- [tests/](tests/): pytest suite (`make test`)
+- [LICENSE](LICENSE): GPL-2.0-or-later
+- [Upstream Mock](https://github.com/rpm-software-management/mock): Host tool this overlay plugs into
+- [CycloneDX 1.6](https://cyclonedx.org/docs/1.6/json/): Atomic BOM on-disk format
+- [SPDX 2.3](https://spdx.github.io/spdx-spec/v2.3/): Alternate Atomic BOM on-disk format

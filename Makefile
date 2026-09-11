@@ -1,47 +1,54 @@
-# Makefile for mock-sbom-generator sources
+# Makefile for Atomic BOM (mock-sbom-generator)
 
-RPMBUILD_DIR := $(HOME)/rpmbuild
-SOURCES_DIR := $(RPMBUILD_DIR)/SOURCES
-SPECS_DIR := $(RPMBUILD_DIR)/SPECS
-SRPMS_DIR := $(RPMBUILD_DIR)/SRPMS
-RPMS_DIR := $(RPMBUILD_DIR)/RPMS
+PREFIX ?= /usr
+DESTDIR ?=
+BINDIR ?= $(PREFIX)/bin
+DATADIR ?= $(PREFIX)/share
+MANDIR ?= $(DATADIR)/man
+DOCDIR ?= $(DATADIR)/doc/mock-sbom-generator
+PYTHON ?= python3
+SITELIB ?= $(shell $(PYTHON) -c "import sysconfig; print(sysconfig.get_path('purelib'))")
 
-SPEC_FILE := mock-sbom-generator.spec
+INSTALL ?= install
 
-.PHONY: all clean distclean stage test rpmbuild-build help
+.PHONY: all help test install clean
 
-all: help
+all:
+	@true
 
 help:
-	@echo "Available targets:"
-	@echo "  make test           - Run unit tests"
-	@echo "  make rpmbuild-build - Build RPM using local rpmbuild"
-	@echo "  make clean          - Clean rpmbuild directories"
-
-stage:
-	@mkdir -p $(RPMBUILD_DIR)/{BUILD,RPMS,SOURCES,SPECS,SRPMS}
-	@./scripts/stage-rpm-sources.sh $(SOURCES_DIR)
-	@cp $(SPEC_FILE) $(SPECS_DIR)/
+	@echo "Targets:"
+	@echo "  make        - No-op build (Python sources)"
+	@echo "  make test   - Run unit tests"
+	@echo "  make install - Install CLI, plugin, libraries, man, and docs"
+	@echo "  make clean  - Remove bytecode and pytest cache"
+	@echo "  make help   - Show this help"
 
 test:
 	python3 -m pytest tests/ -q
 
-rpmbuild-build: stage
-	@rpmbuild -ba $(SPECS_DIR)/$(SPEC_FILE) \
-		--define "_sourcedir $(SOURCES_DIR)" \
-		--define "_specdir $(SPECS_DIR)" \
-		--define "_builddir $(RPMBUILD_DIR)/BUILD" \
-		--define "_srcrpmdir $(SRPMS_DIR)" \
-		--define "_rpmdir $(RPMS_DIR)"
-	@echo "Build complete! RPMs are in: $(RPMS_DIR)/noarch/"
-	@echo "SRPM is in: $(SRPMS_DIR)/"
+install:
+	$(INSTALL) -d $(DESTDIR)$(BINDIR)
+	$(INSTALL) -m 0755 SOURCES/mock-sbom-generator.py \
+		$(DESTDIR)$(BINDIR)/mock-sbom-generator
+	$(INSTALL) -d $(DESTDIR)$(SITELIB)/mockbuild/plugins
+	$(INSTALL) -m 0644 SOURCES/plugins/sbom_generator.py \
+		$(DESTDIR)$(SITELIB)/mockbuild/plugins/sbom_generator.py
+	$(INSTALL) -m 0644 SOURCES/mockbuild/sbom_generate.py \
+		$(DESTDIR)$(SITELIB)/mockbuild/sbom_generate.py
+	$(INSTALL) -m 0644 SOURCES/mockbuild/sbom_utils.py \
+		$(DESTDIR)$(SITELIB)/mockbuild/sbom_utils.py
+	$(INSTALL) -m 0644 SOURCES/mockbuild/sbom_cyclonedx.py \
+		$(DESTDIR)$(SITELIB)/mockbuild/sbom_cyclonedx.py
+	$(INSTALL) -m 0644 SOURCES/mockbuild/sbom_spdx.py \
+		$(DESTDIR)$(SITELIB)/mockbuild/sbom_spdx.py
+	$(INSTALL) -d $(DESTDIR)$(MANDIR)/man1
+	$(INSTALL) -m 0644 SOURCES/mock-sbom-generator.1 \
+		$(DESTDIR)$(MANDIR)/man1/mock-sbom-generator.1
+	$(INSTALL) -d $(DESTDIR)$(DOCDIR)
+	$(INSTALL) -m 0644 SOURCES/Plugin-SBOM.md $(DESTDIR)$(DOCDIR)/Plugin-SBOM.md
 
 clean:
-	@rm -rf $(RPMBUILD_DIR)/BUILD/*
-	@rm -rf $(RPMS_DIR)/noarch/*
-	@rm -rf $(SRPMS_DIR)/*
-	@echo "Clean complete!"
-
-distclean: clean
-	@rm -rf $(RPMBUILD_DIR)
-	@echo "Distclean complete!"
+	find . -type d -name '__pycache__' -prune -exec rm -rf {} +
+	find . -name '*.pyc' -delete
+	rm -rf .pytest_cache
